@@ -24,7 +24,7 @@ class BigTranslateState(EventState):
 		"""Constructor"""
 		super(BigTranslateState, self).__init__(outcomes=['Success', 'Failure'],
             input_keys=['x','y'])
-		self._topic = "move_distance"
+		self._topic = topic
 		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.MoveDistanceAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 

@@ -25,7 +25,7 @@ class BigDepthState(EventState):
 		super(BigDepthState, self).__init__(outcomes=['Success', 'Failure'],
             input_keys=['depth'])
 		self._topic = topic
-		self.client = ProxyActionClient({"go_to_depth": riptide_controllers.msg.GoToDepthAction})
+		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GoToDepthAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 
 

@@ -24,7 +24,7 @@ class BigDistanceState(EventState):
 		"""Constructor"""
 		super(BigDistanceState, self).__init__(outcomes=['Success', 'Failure'],
             input_keys=['object'], output_keys=['dist'])
-		self._topic = "get_distance"
+		self._topic = topic
 		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GetDistanceAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 

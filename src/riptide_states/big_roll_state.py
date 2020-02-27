@@ -24,7 +24,7 @@ class BigRollState(EventState):
 		"""Constructor"""
 		super(BigRollState, self).__init__(outcomes=['Success', 'Failure'],
             input_keys=['angle'])
-		self._topic = "go_to_roll"
+		self._topic = topic
 		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GoToRollAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 

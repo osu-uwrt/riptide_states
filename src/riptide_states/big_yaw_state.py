@@ -24,7 +24,7 @@ class BigYawState(EventState):
 		"""Constructor"""
 		super(BigYawState, self).__init__(outcomes=['Success', 'Failure'],
             input_keys=['angle'])
-		self._topic = "go_to_yaw"
+		self._topic = topic
 		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GoToYawAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 

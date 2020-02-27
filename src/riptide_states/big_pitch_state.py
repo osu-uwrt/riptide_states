@@ -24,7 +24,7 @@ class BigPitchState(EventState):
 		"""Constructor"""
 		super(BigPitchState, self).__init__(outcomes=['Success', 'Failure'],
             input_keys=['angle'])
-		self._topic = "go_to_pitch"
+		self._topic = topic
 		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GoToPitchAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 

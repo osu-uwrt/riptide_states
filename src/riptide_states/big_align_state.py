@@ -24,7 +24,7 @@ class BigAlignState(EventState):
 		"""Constructor"""
 		super(BigAlignState, self).__init__(outcomes=['Success', 'Failure'],
             input_keys=['obj','bboxWidth','hold'])
-		self._topic = "align"
+		self._topic = topic
 		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.AlignAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 

@@ -23,7 +23,7 @@ class BigGateManeuverState(EventState):
 	def __init__(self, topic):
 		"""Constructor"""
 		super(BigGateManeuverState, self).__init__(outcomes=['Success', 'Failure'])
-		self._topic = "gate_maneuver"
+		self._topic = topic
 		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GateManeuverAction})
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
 
