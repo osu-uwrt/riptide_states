@@ -30,11 +30,11 @@ class BigDepthState(EventState):
 
 
 	def execute(self, userdata):
-		if self.client.has_result("go_to_depth"):
-			result = self.client.get_result("go_to_depth")
+		if self.client.has_result(self._topic):
+			result = self.client.get_result(self._topic)
 			status = 'Success'       
 			return status
 	
 	def on_enter(self, userdata):
 		Logger.loginfo('Moving to depth %f'%userdata.depth)
-		self.client.send_goal("go_to_depth", riptide_controllers.msg.GoToDepthGoal(userdata.depth))
+		self.client.send_goal(self._topic, riptide_controllers.msg.GoToDepthGoal(userdata.depth))
