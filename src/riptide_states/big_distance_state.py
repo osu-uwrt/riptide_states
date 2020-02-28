@@ -31,7 +31,7 @@ class BigDistanceState(EventState):
 
 	def execute(self, userdata):
 		if self.client.has_result(self._topic):
-			userdata.dist = self.client.get_result().distance
+			userdata.dist = self.client.get_result(self._topic).distance
 			status = 'Success'       
 			return status
 	
