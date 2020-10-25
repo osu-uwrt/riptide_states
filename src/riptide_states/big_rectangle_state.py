@@ -27,14 +27,14 @@ class BigRectangleState(EventState):
 	def __init__(self, topic, threshold, time, target, timeout):
 		"""Constructor"""
 		super(BigRectangleState, self).__init__(outcomes=['Success', 'Failed'], output_keys=['x,y'])
-    	self._threshold = threshold
+		self._threshold = threshold
 		self._target_time = time
 		self._start_time = rospy.Time.now()
 		self._timeout = timeout
 		self._topic = topic
 		self._target = target
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
-		self._sub = ProxySubscriber(self._topic: BoundingBoxes)
+		self._sub = ProxySubscriber({self._topic: BoundingBoxes})
 		self.potential
 
 
@@ -62,9 +62,9 @@ class BigRectangleState(EventState):
 
 	def execute(self, userdata):
 		if self._sub.has_msg(self._topic):
-            msg = self._sub.get_last_msg(self._topic)
-            self._sub.remove_last_msg(self._topic)
-			if callback(msg,userdata) == 'Success':
-				return 'Success'
+			msg = self._sub.get_last_msg(self._topic)
+			self._sub.remove_last_msg(self._topic)
+		if callback(msg,userdata) == 'Success':
+			return 'Success'
 		if self.start_time - rospy.Time.now() > self._timeout:
 			return 'Failed'
