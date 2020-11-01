@@ -3,9 +3,13 @@
 from flexbe_core import EventState, Logger
 import rospy
 import riptide_controllers.msg
+import math
 from flexbe_core.proxy import ProxyPublisher
+from flexbe_core.proxy import ProxySubscriberCached
 from flexbe_core.proxy import ProxyActionClient
+from nav_msgs import odometry
 from geometry_msgs.msg import PoseStamped
+from tf.transformations import quaternion_from_euler
 
 
 class BigYawParameterState(EventState):
@@ -27,16 +31,23 @@ class BigYawParameterState(EventState):
 		super(BigYawParameterState, self).__init__(outcomes=['Success', 'Failure'])
 		self._topic = topic
 		self._angle = angle
-		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GoToYawAction})
-		#self._pub = ProxyPublisher({self._topic: PoseStamped})
+		self._pub = ProxyPublisher({self._topic: PoseStamped})
+		self._sub = ProxySubscriberCached({'/puddles/odometry/filtered': odometry})
 
 
 	def execute(self, userdata):
-		if self.client.has_result(self._topic):
-			result = self.client.get_result(self._topic)
-			status = 'Success'       
-			return status
+		#if self.client.has_result(self._topic):
+			#result = self.client.get_result(self._topic)
+			#status = 'Success'       
+			#return status
+		if self._sub.has_msg('/puddles/odometry/filtered'):
+			msg = self._sub.get_last_msg('/puddles/odometry/filtered')
+			currentOrientation = msg.pose.pose.orientation
+
+
 	
 	def on_enter(self, userdata):
 		Logger.loginfo('Yawing with angle %f'%self._angle)
-		self.client.send_goal(self._topic, riptide_controllers.msg.GoToYawGoal(self._angle))
+		radian = math.radians(self._angle)
+		q = quaternion_from_euler(0,0,radian)
+		self._pub.publish(self._topic, q)
