@@ -2,6 +2,7 @@
 
 from flexbe_core import EventState, Logger
 import rospy
+from flexbe_core.proxy import ProxyActionClient
 
 from flexbe_core.proxy import ProxyPublisher
 from geometry_msgs.msg import PoseStamped
@@ -25,11 +26,15 @@ class BigMoveState(EventState):
 												input_keys=['pose'])
 
 		self._topic = topic
-		self._pub = ProxyPublisher({self._topic: PoseStamped})
+		# self._pub = ProxyPublisher({self._topic: PoseStamped})
+		self.client = ProxyActionClient({self._topic: PoseStamped})
 
 
 	def execute(self, userdata):
-		return 'done'
+		if self.client.has_result(self._topic):
+    		result = self.client.get_result(self._topic)
+			status = 'Success'       
+			return status
 	
 	def on_enter(self, userdata):
 		self._pub.publish(self._topic, userdata.pose)
