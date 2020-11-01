@@ -7,7 +7,7 @@ import math
 from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxySubscriberCached
 from flexbe_core.proxy import ProxyActionClient
-from nav_msgs import odometry
+from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped
 from tf.transformations import quaternion_from_euler
 
@@ -32,7 +32,7 @@ class BigYawParameterState(EventState):
 		self._topic = topic
 		self._angle = angle
 		self._pub = ProxyPublisher({self._topic: PoseStamped})
-		self._sub = ProxySubscriberCached({'/puddles/odometry/filtered': odometry})
+		self._sub = ProxySubscriberCached({'/puddles/odometry/filtered': Odometry})
 
 
 	def execute(self, userdata):
@@ -50,4 +50,7 @@ class BigYawParameterState(EventState):
 		Logger.loginfo('Yawing with angle %f'%self._angle)
 		radian = math.radians(self._angle)
 		q = quaternion_from_euler(0,0,radian)
+		msg = PoseStamped()
+		msg.pose.orientation.x = q.x
 		self._pub.publish(self._topic, q)
+		
