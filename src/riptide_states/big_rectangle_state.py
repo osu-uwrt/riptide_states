@@ -2,7 +2,8 @@
 
 from flexbe_core import EventState, Logger
 import rospy
-import darknet_ros_msgs.msg._BoundingBoxes as BoundingBoxes
+from darknet_ros_msgs.msg import BoundingBoxes
+#import darknet_ros_msgs.msg._BoundingBoxes as BoundingBoxes
 from flexbe_core.proxy import ProxySubscriberCached
 from flexbe_core.proxy import ProxyPublisher
 from geometry_msgs.msg import PoseStamped
@@ -30,7 +31,8 @@ class BigRectangleState(EventState):
 		self._threshold = threshold
 		self._target_time = time
 		self._start_time = rospy.Time.now()
-		self._timeout = timeout
+		self._timeout_temp = timeout
+		self._timeout = []
 		self._topic = topic
 		self._target = target
 		#self._pub = ProxyPublisher({self._topic: PoseStamped})
@@ -57,11 +59,11 @@ class BigRectangleState(EventState):
 				if not found:
 					self._potential[len(self._potential)+1].box = box
 					self._potential[len(self._potential)+1].time = bbox.header.stamp.nseq
-
 		return 'Failed'
 
 
 	def execute(self,userdata):
+		msg = BoundingBoxes()
 		if self._sub.has_msg(self._topic):
 			msg = self._sub.get_last_msg(self._topic)
 			self._sub.remove_last_msg(self._topic)
@@ -69,3 +71,6 @@ class BigRectangleState(EventState):
 			return 'Success'
 		if self._start_time - rospy.Time.now() > self._timeout:
 			return 'Failed'
+
+	def on_enter(self, userdata):
+		self._timeout = rospy.Duration.from_sec(self._timeout_temp)
