@@ -33,7 +33,7 @@ class BigMoveState(EventState):
 		self._topic = topic
 		moveit_commander.roscpp_initialize(sys.argv)
 		self._robot = moveit_commander.RobotCommander()
-		self._scene = scene = moveit_commander.PlanningSceneInterface()
+		self._scene =  moveit_commander.PlanningSceneInterface()
 		self._group_name = group
 		self._odom = "/puddles/odometry/filtered"
 		self._move_group = moveit_commander.MoveGroupCommander(self._group_name)
