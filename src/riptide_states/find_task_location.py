@@ -17,10 +17,10 @@ class FindTask(EventState):
 
 	"""
 
-	def __init__(self, target, subscribe):
+	def __init__(self, target):
 		"""Constructor"""
 		super(FindTask, self).__init__(outcomes=['Success', 'Failed'], output_keys=['position','orientation'])
-		self._sub = ProxySubscriberCached({self._topic: subscribe})
+		self._sub = ProxySubscriberCached({self._topic: target})
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
 
