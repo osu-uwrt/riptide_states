@@ -10,7 +10,7 @@ from geometry_msgs.msg import PoseStamped
 
 class BigGateManeuverState(EventState):
 	"""
-	Publishes a pose from userdata so that it can be displayed in rviz.
+	(deprecated) does the gate task maneuver.
 
 	-- topic 		string 			Topic to which the pose will be published.
 

@@ -36,11 +36,6 @@ class BigMoveState(EventState):
 		self.loc_topic = '/Puddles/odometry/filtered'
 		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
 		
-
-		
-		
-
-
 	def execute(self, userdata):
 		return 'done'
 	
