@@ -34,7 +34,7 @@ class BigMoveState(EventState):
 		self.z = z
 		self.orientation = orientation
 
-		self.loc_topic = '/Puddles/odometry/filtered'
+		self.loc_topic = '/puddles/odometry/filtered'
 		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
 		
 	def execute(self, userdata):
@@ -45,7 +45,7 @@ class BigMoveState(EventState):
 		self.robot = RobotCommander()
 		msg = Odometry()
 		if self.sub.has_msg(self.loc_topic):
-			msg = self.sub.get_last_msg()
+			msg = self.sub.get_last_msg(self.loc_topic)
 			self.sub.remove_last_msg(self.loc_topic)
 		
 		self.x += msg.pose.pose.position.x
