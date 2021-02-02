@@ -11,6 +11,7 @@ from geometry_msgs.msg import PoseStamped
 from moveit_commander import RobotCommander, roscpp_initialize, roscpp_shutdown
 from moveit_msgs.msg import RobotState
 from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Quaternion
 
 
 class BigMoveState(EventState):
@@ -52,10 +53,18 @@ class BigMoveState(EventState):
 			msg = self.sub.get_last_msg()
 			self.sub.remove_last_msg(self.loc_topic)
 		
-		self.x += msg.pose.pose.x
-		self.y += msg.pose.pose.y
-		self.z += msg.pose.pose.z 
+		self.x += msg.pose.pose.position.x
+		self.y += msg.pose.pose.position.y
+		self.z += msg.pose.pose.position.z 
+		
 
+		if self.orientation == None:
+			self.orientation = Quaternion()
+			self.orientation.x = msg.pose.pose.orientation.x
+			self.orientation.y = msg.pose.pose.orientation.y
+			self.orientation.z = msg.pose.pose.orientation.z
+			self.orientation.w = msg.pose.pose.orientation.w
+		
 		# X, Y, Z, x, y, z, w
 		r = [self.x, self.y, self.z, 0, 0, 0, 1]
 
