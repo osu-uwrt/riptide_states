@@ -61,7 +61,7 @@ class BigMoveState(EventState):
 			self.orientation.w = msg.pose.pose.orientation.w
 		
 		# X, Y, Z, x, y, z, w
-		r = [self.x, self.y, self.z, 0, 0, 0, 1]
+		r = [self.x, self.y, self.z, self.orientation.x, self.orientation.y, self.orientation.z, self.orientation.w]
 
 		self.planner = self.robot.puddles_base
 		self.plan = self.planner.plan(r)
