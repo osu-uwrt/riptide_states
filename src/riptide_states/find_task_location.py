@@ -7,7 +7,7 @@ from flexbe_core.proxy import ProxySubscriberCached
 from flexbe_core.proxy import ProxyPublisher
 
 
-class FindTask(EventState):
+class FindTaskLocation(EventState):
 	"""
 	Returns the general position and orientation of the gate task
 
