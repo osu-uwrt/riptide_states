@@ -3,14 +3,15 @@
 from flexbe_core import EventState, Logger
 import rospy
 from flexbe_core.proxy import ProxySubscriberCached
+from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose
 import tf2_geometry_msgs
 import tf2_ros
 
 
-class GetFrontOf(EventState):
+class TransferToGlobal(EventState):
 	"""
-	Changes the input position to be 3 feet in front of the object.
+	Turns coordinates relative to the robot into coordinates relative to total world
 
 	<= Success						Coordinates are published.
 
@@ -34,32 +35,28 @@ class GetFrontOf(EventState):
 			raise
 
 
-	def __init__(self,target):
+	def __init__(self,x,y,z,orientation):
 		"""Constructor"""
-		super(GetFrontOf, self).__init__(outcomes=['Success'], output_keys=['x','y','z','orientation'])
-		self._frame = target
+		super(TransferToGlobal, self).__init__(outcomes=['Success'], output_keys=['x','y','z','orientation'])
+		self.loc_topic = '/puddles/odometry/filtered'
+		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
+		self._pose = Pose()
+		self._pose.x = x
+		self._pose.y = y
+		self._pose.z = z
+		self._pose.orientation = orientation
+		self._frame = "puddles/base_link"
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
 
 
 	def callback(self,userdata):
-		_pose = Pose()
 		#Changing the coordinate system into the viewpoint of the target to easily move the robot three feet in front of it
-		transformed_pose = self.transform_pose(_pose, "world", self._frame)
-		transformed_pose.position.x = -3
-		transformed_pose.position.y = 0
-		transformed_pose.position.z = 0
-		transformed_pose.orientation.x = 0
-		transformed_pose.orientation.y = 0
-		transformed_pose.orientation.z = 0
-		transformed_pose.orientation.w = 0
-		#Changing the coordinates back into global
-		_updated_pose = self.transform_pose(transformed_pose,self._frame,"world")
-		#Splitting the pose to be able to be used in the move state (Maybe change move state to use pose instead of xyzw)
-		userdata.x = _updated_pose.x
-		userdata.y = _updated_pose.y
-		userdata.z = _updated_pose.z
-		userdata.orientation = _updated_pose.orientation
+		transformed_pose = self.transform_pose(self._pose, self._frame, "world")
+		userdata.x = transformed_pose.x
+		userdata.y = transformed_pose.y
+		userdata.z = transformed_pose.z
+		userdata.orientation = transformed_pose.orientation
 		return 'Success'
 
 		
@@ -74,4 +71,9 @@ class GetFrontOf(EventState):
 
 
 	def on_enter(self, userdata):
+		if self.sub.has_msg(self.loc_topic):
+			msg = self.sub.get_last_msg(self.loc_topic)
+			self.sub.remove_last_msg(self.loc_topic)
+		if self._pose.orientation is None:
+			self._pose.orientation = msg.pose.pose.orientation
 		self._timeout = rospy.Duration.from_sec(self._timeout_temp)
