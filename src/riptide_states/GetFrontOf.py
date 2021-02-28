@@ -56,9 +56,9 @@ class GetFrontOf(EventState):
 		#Changing the coordinates back into global
 		_updated_pose = self.transform_pose(transformed_pose,self._frame,"world")
 		#Splitting the pose to be able to be used in the move state (Maybe change move state to use pose instead of xyzw)
-		userdata.x = _updated_pose.x
-		userdata.y = _updated_pose.y
-		userdata.z = _updated_pose.z
+		userdata.x = _updated_pose.position.x
+		userdata.y = _updated_pose.position.y
+		userdata.z = _updated_pose.position.z
 		userdata.orientation = _updated_pose.orientation
 		return 'Success'
 

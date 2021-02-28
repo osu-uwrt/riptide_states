@@ -41,9 +41,9 @@ class TransferToGlobal(EventState):
 		self.loc_topic = '/puddles/odometry/filtered'
 		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
 		self._pose = Pose()
-		self._pose.x = x
-		self._pose.y = y
-		self._pose.z = z
+		self._pose.position.x = x
+		self._pose.position.y = y
+		self._pose.position.z = z
 		self._pose.orientation = orientation
 		self._frame = "puddles/base_link"
 		self._start_time = rospy.Time.now()
@@ -53,9 +53,9 @@ class TransferToGlobal(EventState):
 	def callback(self,userdata):
 		#Changing the coordinate system into the viewpoint of the target to easily move the robot three feet in front of it
 		transformed_pose = self.transform_pose(self._pose, self._frame, "world")
-		userdata.x = transformed_pose.x
-		userdata.y = transformed_pose.y
-		userdata.z = transformed_pose.z
+		userdata.x = transformed_pose.position.x
+		userdata.y = transformed_pose.position.y
+		userdata.z = transformed_pose.position.z
 		userdata.orientation = transformed_pose.orientation
 		return 'Success'
 

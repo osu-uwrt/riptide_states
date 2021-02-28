@@ -26,13 +26,10 @@ class BigMoveState(EventState):
 
 	"""
 	
-	def __init__(self, x,y,z,orientation):
+	def __init__(self):
 		"""Constructor"""
-		super(BigMoveState, self).__init__(outcomes=['done','failed'])
-		self.x = x
-		self.y = y
-		self.z = z
-		self.orientation = orientation
+		super(BigMoveState, self).__init__(outcomes=['done','failed'], input_keys = ['x','y','z','orientation'])
+		
 
 		self.loc_topic = '/puddles/odometry/filtered'
 		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
@@ -41,6 +38,10 @@ class BigMoveState(EventState):
 		return 'done'
 	
 	def on_enter(self, userdata):
+		self.x = userdata.x
+		self.y = userdata.y
+		self.z = userdata.z
+		self.orientation = userdata.orientation
 		roscpp_initialize(sys.argv)
 		self.robot = RobotCommander()
 		msg = Odometry()
