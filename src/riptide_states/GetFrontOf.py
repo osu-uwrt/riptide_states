@@ -21,7 +21,6 @@ class GetFrontOf(EventState):
 	"""
 
 	def transform_pose(self, input_pose, from_frame, to_frame):
-
 		# **Assuming /tf2 topic is being broadcasted
 		tf_buffer = tf2_ros.Buffer()
 		listener = tf2_ros.TransformListener(tf_buffer)
@@ -35,7 +34,6 @@ class GetFrontOf(EventState):
 			return output_pose_stamped.pose
 		except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
 			raise
-
 
 
 	def __init__(self,target):
