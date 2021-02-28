@@ -48,9 +48,9 @@ class BigMoveState(EventState):
 			msg = self.sub.get_last_msg(self.loc_topic)
 			self.sub.remove_last_msg(self.loc_topic)
 		
-		self.x += msg.pose.pose.position.x
-		self.y += msg.pose.pose.position.y
-		self.z += msg.pose.pose.position.z 
+		self.x = msg.pose.pose.position.x
+		self.y = msg.pose.pose.position.y
+		self.z = msg.pose.pose.position.z 
 		
 
 		if self.orientation == None:
