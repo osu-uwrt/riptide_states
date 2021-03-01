@@ -2,6 +2,7 @@
 
 from flexbe_core import EventState, Logger
 import rospy
+import math
 import riptide_controllers.msg
 from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxyActionClient
@@ -10,7 +11,7 @@ from tf.transformations import quaternion_from_euler
 from nav_msgs.msg import Odometry
 from flexbe_core.proxy import ProxySubscriberCached 
 from tf import transformations
-from tf.transformations import quarternion_multiply
+from tf.transformations import quaternion_multiply
 
 class BigRollState(EventState):
 	"""
@@ -46,5 +47,5 @@ class BigRollState(EventState):
 		self._sub.remove_last_msg('/puddles/odometry/filtered') # clear
 		
 		initOrientation = initmsg.pose.pose.orientation 
-		newQuat = quarternion_multiply(initOrientation, myQuaternion)
+		newQuat = quaternion_multiply(initOrientation, myQuaternion)
 		self.client.publish(self._topic, newQuat)
