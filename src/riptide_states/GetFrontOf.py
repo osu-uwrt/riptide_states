@@ -28,7 +28,7 @@ class GetFrontOf(EventState):
 		pose_stamped.header.stamp = rospy.Time.now()
 		try:
 			# ** It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
-			output_pose_stamped = tf_buffer.transform(pose_stamped, to_frame, rospy.Duration(1))
+			output_pose_stamped = tf_buffer.transform(pose_stamped, to_frame, rospy.Duration(5))
 			return output_pose_stamped.pose
 		except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
 			raise

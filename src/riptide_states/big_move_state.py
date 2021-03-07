@@ -43,6 +43,7 @@ class BigMoveState(EventState):
 		self.y = userdata.y
 		self.z = userdata.z
 		self.orientation = userdata.orientation
+		Logger.loginfo('XYZ: {}{}{} and orientation {}'.format(self.x,self.y,self.z,self.orientation))
 		roscpp_initialize(sys.argv)
 		self.robot = RobotCommander()
 		msg = Odometry()
