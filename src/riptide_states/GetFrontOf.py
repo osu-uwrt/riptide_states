@@ -18,13 +18,13 @@ class GetFrontOf(EventState):
 	"""
 
 	def transform_pose(self, input_pose, from_frame, to_frame):
-		tl = tf.TransformListener()
-		t = tl.getLatestCommonTime(from_frame, to_frame)
+		
+		t = self.tl.getLatestCommonTime(from_frame, to_frame)
 		p1 = PoseStamped()
 		p1.header.frame_id = from_frame
 		p1.header.stamp = t
 		p1.pose = input_pose
-		convertedPos = tl.transformPose(to_frame, p1)
+		convertedPos = self.tl.transformPose(to_frame, p1)
 		return convertedPos
 
 
@@ -32,8 +32,10 @@ class GetFrontOf(EventState):
 		"""Constructor"""
 		super(GetFrontOf, self).__init__(outcomes=['Success'], output_keys=['x','y','z','orientation'])
 		self._frame = target
+		Logger.loginfo(target)
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
+		self.tl = tf.TransformListener()
 
 
 	def callback(self,userdata):
@@ -48,7 +50,7 @@ class GetFrontOf(EventState):
 		transformed_pose.orientation.z = 0
 		transformed_pose.orientation.w = 1
 		#Changing the coordinates back into global
-		_updated_pose = self.transform_pose(transformed_pose,self._frame,"world")
+		_updated_pose = self.transform_pose(transformed_pose,self._frame,"/world")
 		#Splitting the pose to be able to be used in the move state (Maybe change move state to use pose instead of xyzw)
 		userdata.x = _updated_pose.pose.position.x
 		userdata.y = _updated_pose.pose.position.y

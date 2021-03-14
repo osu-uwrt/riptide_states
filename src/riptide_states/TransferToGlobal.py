@@ -30,22 +30,23 @@ class TransferToGlobal(EventState):
 		self._pose.position.y = y
 		self._pose.position.z = z
 		self._pose.orientation = orientation
-		self._frame = "puddles/base_link_ned"
+		self._frame = "/puddles/base_link"
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
 
+		self.tl = tf.TransformListener()
 
 	def callback(self,userdata):
 		#Changing the coordinate system into the viewpoint of the target to easily move the robot three feet in front of it
-		tl = tf.TransformListener()
-		t = tl.getLatestCommonTime(self._frame,"world")
+		
+		
+		t = self.tl.getLatestCommonTime(self._frame,"/world")
 		pl = PoseStamped()
 		pl.header.frame_id = self._frame
 		pl.header.stamp = t
 		pl.pose = self._pose
-		convertedPos = tl.transformPose("world", pl)
+		convertedPos = self.tl.transformPose("/world", pl)
 
-		transformed_pose = self.transform_pose(self._pose, self._frame, "world")
 		Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(convertedPos.position.x,convertedPos.position.y,convertedPos.position.z,transformed_pose.position.orientation.x,transformed_pose.position.orientation.y,transformed_pose.position.orientation.z,transformed_pose.position.orientation.w))
 		userdata.x = convertedPos.pose.position.x
 		userdata.y = convertedPos.pose.position.y
