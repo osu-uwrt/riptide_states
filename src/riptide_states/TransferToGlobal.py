@@ -47,7 +47,7 @@ class TransferToGlobal(EventState):
 		pl.pose = self._pose
 		convertedPos = self.tl.transformPose("/world", pl)
 
-		Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(convertedPos.position.x,convertedPos.position.y,convertedPos.position.z,transformed_pose.position.orientation.x,transformed_pose.position.orientation.y,transformed_pose.position.orientation.z,transformed_pose.position.orientation.w))
+		#Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(convertedPos.position.x,convertedPos.position.y,convertedPos.position.z,transformed_pose.position.orientation.x,transformed_pose.position.orientation.y,transformed_pose.position.orientation.z,transformed_pose.position.orientation.w))
 		userdata.x = convertedPos.pose.position.x
 		userdata.y = convertedPos.pose.position.y
 		userdata.z = convertedPos.pose.position.z

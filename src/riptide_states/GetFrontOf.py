@@ -32,7 +32,7 @@ class GetFrontOf(EventState):
 		"""Constructor"""
 		super(GetFrontOf, self).__init__(outcomes=['Success'], output_keys=['x','y','z','orientation'])
 		self._frame = target
-		Logger.loginfo(target)
+		#Logger.loginfo(target)
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
 		self.tl = tf.TransformListener()
