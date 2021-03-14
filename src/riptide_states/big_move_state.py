@@ -50,11 +50,7 @@ class BigMoveState(EventState):
 		if self.sub.has_msg(self.loc_topic):
 			msg = self.sub.get_last_msg(self.loc_topic)
 			self.sub.remove_last_msg(self.loc_topic)
-		
-		self.x = msg.pose.pose.position.x
-		self.y = msg.pose.pose.position.y
-		self.z = msg.pose.pose.position.z 
-		
+				
 
 		if self.orientation == None:
 			self.orientation = Quaternion()
@@ -62,6 +58,7 @@ class BigMoveState(EventState):
 			self.orientation.y = msg.pose.pose.orientation.y
 			self.orientation.z = msg.pose.pose.orientation.z
 			self.orientation.w = msg.pose.pose.orientation.w
+		
 		
 		# X, Y, Z, x, y, z, w
 		r = [self.x, self.y, self.z, self.orientation.x, self.orientation.y, self.orientation.z, self.orientation.w]
