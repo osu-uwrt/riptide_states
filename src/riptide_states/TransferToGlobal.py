@@ -71,7 +71,7 @@ class TransferToGlobal(EventState):
 
 
 	def on_enter(self, userdata):
-    	msg = tf2_geometry_msgs.PoseStamped()
+		msg = tf2_geometry_msgs.PoseStamped()
 		if self.sub.has_msg(self.loc_topic):
 			msg = self.sub.get_last_msg(self.loc_topic)
 			self.sub.remove_last_msg(self.loc_topic)
