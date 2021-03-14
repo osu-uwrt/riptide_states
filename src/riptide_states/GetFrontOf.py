@@ -28,7 +28,7 @@ class GetFrontOf(EventState):
 		pose_stamped.header.stamp = rospy.Time.now()
 		try:
 			# ** It is important to wait for the listener to start listening. Hence the rospy.Duration(1)
-			output_pose_stamped = tf_buffer.transform(pose_stamped, to_frame, rospy.Duration(5))
+			output_pose_stamped = tf_buffer.transform(pose_stamped, to_frame, rospy.Duration(1))
 			return output_pose_stamped.pose
 		except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
 			raise
@@ -52,7 +52,7 @@ class GetFrontOf(EventState):
 		transformed_pose.orientation.x = 0
 		transformed_pose.orientation.y = 0
 		transformed_pose.orientation.z = 0
-		transformed_pose.orientation.w = 0
+		transformed_pose.orientation.w = 1
 		#Changing the coordinates back into global
 		_updated_pose = self.transform_pose(transformed_pose,self._frame,"world")
 		#Splitting the pose to be able to be used in the move state (Maybe change move state to use pose instead of xyzw)
