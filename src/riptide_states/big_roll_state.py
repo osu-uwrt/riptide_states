@@ -46,10 +46,7 @@ class BigRollState(EventState):
 		self._sub.remove_last_msg('/puddles/odometry/filtered') # clear
 		quaternion = quaternion_from_euler(0, 0, 0)
 		#type(pose) = geometry_msgs.msg.Pose
-		
-
-
-		initOrientation = initmsg.pose.pose.orientation 
+		tientation 
 		quaternion[0] = initOrientation.x
 		quaternion[1] = initOrientation.y
 		quaternion[2] = initOrientation.z
