@@ -10,7 +10,8 @@ from geometry_msgs.msg import PoseStamped
 from tf.transformations import quaternion_from_euler
 from nav_msgs.msg import Odometry
 from flexbe_core.proxy import ProxySubscriberCached 
-from tf import transformations
+from tf import transformations 
+
 from tf.transformations import quaternion_multiply
 
 class BigRollState(EventState):
@@ -33,11 +34,9 @@ class BigRollState(EventState):
 		self.client = ProxyPublisher({self._topic: PoseStamped})
 		self._sub = ProxySubscriberCached({'/puddles/odometry/filtered': Odometry}) # outputs current state variables, gives q of orientation
 
-	def execute(self, userdata):
-		if self.client.has_result(self._topic):
-			result = self.client.get_result(self._topic)
-			status = 'Success'       
-			return status
+	def execute(self, userdata):			
+		status = 'Success'       
+		return status
 	
 	def on_enter(self, userdata):
 		Logger.loginfo('Rolling with angle %f'%self._angle)
@@ -45,7 +44,21 @@ class BigRollState(EventState):
 		myQuaternion = quaternion_from_euler(radian,0,0) # converts from radians to quaternions
 		initmsg = self._sub.get_last_msg('/puddles/odometry/filtered') # initial position
 		self._sub.remove_last_msg('/puddles/odometry/filtered') # clear
+		quaternion = quaternion_from_euler(0, 0, 0)
+		#type(pose) = geometry_msgs.msg.Pose
 		
+
+
 		initOrientation = initmsg.pose.pose.orientation 
-		newQuat = quaternion_multiply(initOrientation, myQuaternion)
-		self.client.publish(self._topic, newQuat)
+		quaternion[0] = initOrientation.x
+		quaternion[1] = initOrientation.y
+		quaternion[2] = initOrientation.z
+		quaternion[3] = initOrientation.w
+
+		newQuat = quaternion_multiply(myQuaternion, quaternion)
+		initOrientation.x = newQuat[0]
+		initOrientation.y = newQuat[1]
+		initOrientation.z = newQuat[2]
+		initOrientation.w = newQuat[3]
+
+		self.client.publish(self._topic, initOrientation)
