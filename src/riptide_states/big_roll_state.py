@@ -34,7 +34,10 @@ class BigRollState(EventState):
 		self.client = ProxyPublisher({self._topic: Quaternion})
 		self._sub = ProxySubscriberCached({'/puddles/odometry/filtered': Odometry}) # outputs current state variables, gives q of orientation
 
-	def execute(self, userdata):			
+	def execute(self, userdata):
+		Logger.loginfo("Waiting 3 Seconds")
+		rospy.sleep(3)
+		Logger.loginfo("Done Rolling")			
 		status = 'Success'       
 		return status
 	
@@ -64,4 +67,5 @@ class BigRollState(EventState):
 		initOrientation.z = newQuat[2]
 		initOrientation.w = newQuat[3]
 
+		Logger.loginfo("Published Orientation")
 		self.client.publish(self._topic, initOrientation)
