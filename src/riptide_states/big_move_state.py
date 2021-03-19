@@ -54,27 +54,23 @@ class BigMoveState(EventState):
 		self.x = userdata.x
 		self.y = userdata.y
 		self.z = userdata.z
-		self.orientation = userdata.orientation
-
-
-		
-
-		
+		self.orientation = userdata.orientation	
 
 		robot = moveit_commander.RobotCommander()
 
 		scene = moveit_commander.PlanningSceneInterface()
 
-
-
 		group_name = "puddles_base"
 		move_group = moveit_commander.MoveGroupCommander(group_name)
 
-		if self.sub.has_msg(self.loc_topic):
-			msg = self.sub.get_last_msg(self.loc_topic)
-			self.sub.remove_last_msg(self.loc_topic)
-
+		while not self.sub.has_msg(self.loc_topic):
+			Logger.loginfo("Waiting for Localization message")
+		
 		msg = Odometry()
+		msg = self.sub.get_last_msg(self.loc_topic)
+		self.sub.remove_last_msg(self.loc_topic)
+
+		
 
 		if self.orientation == None:
 		 	self.orientation = geometry_msgs.Quaternion()
@@ -82,6 +78,8 @@ class BigMoveState(EventState):
 		 	self.orientation.y = msg.pose.pose.orientation.y
 			self.orientation.z = msg.pose.pose.orientation.z
 		 	self.orientation.w = msg.pose.pose.orientation.w
+		
+			
 
 		joint_goal = move_group.get_current_joint_values()
 
@@ -89,27 +87,12 @@ class BigMoveState(EventState):
 
 		move_group.set_planning_time(1)
 		move_group.set_workspace([-50,-50,-30,50,50,0])
-		#print(joint_goal)
+		
+		
 		plan = move_group.plan(joint_goal)
 
-		#print(plan)
+		
 		move_group.execute(plan,wait=False)
 
 		move_group.stop()
-		# roscpp_initialize(sys.argv)
-		# self.robot = RobotCommander()
 		
-		
-				
-
-		# 
-		
-		# Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(self.x,self.y,self.z,self.orientation.x,self.orientation.y,self.orientation.z,self.orientation.w))
-
-		# # X, Y, Z, x, y, z, w
-		# r = [self.x, self.y, self.z, self.orientation.x, self.orientation.y, self.orientation.z, self.orientation.w]
-
-		# self.planner = self.robot.puddles_base
-		# self.plan = self.planner.plan(r)
-
-		# self.planner.execute(self.plan)
