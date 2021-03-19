@@ -8,10 +8,12 @@ from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxySubscriberCached
 from geometry_msgs.msg import PoseStamped
 
-from moveit_commander import RobotCommander, roscpp_initialize, roscpp_shutdown
-from moveit_msgs.msg import RobotState
+import moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
+from moveit_commander.conversions import pose_to_list
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Quaternion
+
 
 
 class BigMoveState(EventState):
@@ -34,36 +36,80 @@ class BigMoveState(EventState):
 
 		self.loc_topic = '/puddles/odometry/filtered'
 		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
+		moveit_commander.roscpp_initialize(sys.argv)
+		#rospy.init_node('test_move_group', anonymous=True)
 		
 	def execute(self, userdata):
-		return 'done'
+		threshold = .2
+		if self.sub.has_msg(self.loc_topic):
+			msg = self.sub.get_last_msg(self.loc_topic)
+			self.sub.remove_last_msg(self.loc_topic)
+			if userdata.x-threshold < msg.pose.pose.position.x < userdata.x +threshold:
+				if userdata.y-threshold < msg.pose.pose.position.y < userdata.y+threshold:
+					if userdata.z - threshold < msg.pose.pose.position.z < userdata.z+threshold:
+						return 'done'
+		
 	
 	def on_enter(self, userdata):
 		self.x = userdata.x
 		self.y = userdata.y
 		self.z = userdata.z
 		self.orientation = userdata.orientation
-		roscpp_initialize(sys.argv)
-		self.robot = RobotCommander()
-		msg = Odometry()
+
+
+		
+
+		
+
+		robot = moveit_commander.RobotCommander()
+
+		scene = moveit_commander.PlanningSceneInterface()
+
+
+
+		group_name = "puddles_base"
+		move_group = moveit_commander.MoveGroupCommander(group_name)
+
 		if self.sub.has_msg(self.loc_topic):
 			msg = self.sub.get_last_msg(self.loc_topic)
 			self.sub.remove_last_msg(self.loc_topic)
-				
+
+		msg = Odometry()
 
 		if self.orientation == None:
-			self.orientation = Quaternion()
+		 	self.orientation = geometry_msgs.Quaternion()
 			self.orientation.x = msg.pose.pose.orientation.x
-			self.orientation.y = msg.pose.pose.orientation.y
+		 	self.orientation.y = msg.pose.pose.orientation.y
 			self.orientation.z = msg.pose.pose.orientation.z
-			self.orientation.w = msg.pose.pose.orientation.w
+		 	self.orientation.w = msg.pose.pose.orientation.w
+
+		joint_goal = move_group.get_current_joint_values()
+
+		joint_goal = [self.x,self.y,self.z,self.orientation.x, self.orientation.y, self.orientation.z, self.orientation.w]
+
+		move_group.set_planning_time(1)
+		move_group.set_workspace([-50,-50,-30,50,50,0])
+		#print(joint_goal)
+		plan = move_group.plan(joint_goal)
+
+		#print(plan)
+		move_group.execute(plan,wait=False)
+
+		move_group.stop()
+		# roscpp_initialize(sys.argv)
+		# self.robot = RobotCommander()
 		
-		Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(self.x,self.y,self.z,self.orientation.x,self.orientation.y,self.orientation.z,self.orientation.w))
+		
+				
 
-		# X, Y, Z, x, y, z, w
-		r = [self.x, self.y, self.z, self.orientation.x, self.orientation.y, self.orientation.z, self.orientation.w]
+		# 
+		
+		# Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(self.x,self.y,self.z,self.orientation.x,self.orientation.y,self.orientation.z,self.orientation.w))
 
-		self.planner = self.robot.puddles_base
-		self.plan = self.planner.plan(r)
+		# # X, Y, Z, x, y, z, w
+		# r = [self.x, self.y, self.z, self.orientation.x, self.orientation.y, self.orientation.z, self.orientation.w]
 
-		self.planner.execute(self.plan)
+		# self.planner = self.robot.puddles_base
+		# self.plan = self.planner.plan(r)
+
+		# self.planner.execute(self.plan)

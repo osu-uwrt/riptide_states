@@ -4,7 +4,7 @@ from flexbe_core import EventState, Logger
 import rospy
 from flexbe_core.proxy import ProxySubscriberCached
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Pose, PoseStamped
+from geometry_msgs.msg import Pose, PoseStamped, Quaternion
 import tf2_geometry_msgs
 import tf
 
@@ -26,10 +26,11 @@ class TransferToGlobal(EventState):
 		self.loc_topic = '/puddles/odometry/filtered'
 		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
 		self._pose = Pose()
+		
 		self._pose.position.x = x
 		self._pose.position.y = y
 		self._pose.position.z = z
-		self._pose.orientation = orientation
+		self._pose.orientation = Quaternion()
 		self._frame = "/puddles/base_link"
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
@@ -44,7 +45,26 @@ class TransferToGlobal(EventState):
 		pl = PoseStamped()
 		pl.header.frame_id = self._frame
 		pl.header.stamp = t
-		pl.pose = self._pose
+		
+		if self.sub.has_msg(self.loc_topic):
+			msg = self.sub.get_last_msg(self.loc_topic)
+			self.sub.remove_last_msg(self.loc_topic)
+
+		msg = Odometry()
+
+		
+		self._pose.orientation = Quaternion()
+		self._pose.orientation.x = msg.pose.pose.orientation.x
+		self._pose.orientation.y = msg.pose.pose.orientation.y
+		self._pose.orientation.z = msg.pose.pose.orientation.z
+		self._pose.orientation.w = msg.pose.pose.orientation.w
+
+		pl.pose.position.x = self._pose.position.x
+		pl.pose.position.y = self._pose.position.y
+		pl.pose.position.z = self._pose.position.z
+		pl.pose.orientation = self._pose.orientation
+
+		convertedPos = PoseStamped()
 		convertedPos = self.tl.transformPose("/world", pl)
 
 		#Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(convertedPos.position.x,convertedPos.position.y,convertedPos.position.z,transformed_pose.position.orientation.x,transformed_pose.position.orientation.y,transformed_pose.position.orientation.z,transformed_pose.position.orientation.w))
@@ -67,7 +87,7 @@ class TransferToGlobal(EventState):
 
 
 	def on_enter(self, userdata):
-		msg = tf2_geometry_msgs.PoseStamped()
+		msg = Odometry()
 		if self.sub.has_msg(self.loc_topic):
 			msg = self.sub.get_last_msg(self.loc_topic)
 			self.sub.remove_last_msg(self.loc_topic)

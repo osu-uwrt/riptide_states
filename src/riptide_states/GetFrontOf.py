@@ -42,13 +42,13 @@ class GetFrontOf(EventState):
 
 		#Changing the coordinate system into the viewpoint of the target to easily move the robot three feet in front of it
 		transformed_pose = Pose()
-		transformed_pose.position.x = -3
-		transformed_pose.position.y = 0
+		transformed_pose.position.x = 1
+		transformed_pose.position.y = -3
 		transformed_pose.position.z = 0
 		transformed_pose.orientation.x = 0
 		transformed_pose.orientation.y = 0
-		transformed_pose.orientation.z = 0
-		transformed_pose.orientation.w = 1
+		transformed_pose.orientation.z =  0.707
+		transformed_pose.orientation.w =  0.707
 		#Changing the coordinates back into global
 		_updated_pose = self.transform_pose(transformed_pose,self._frame,"/world")
 		#Splitting the pose to be able to be used in the move state (Maybe change move state to use pose instead of xyzw)

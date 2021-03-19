@@ -6,7 +6,7 @@ import math
 import riptide_controllers.msg
 from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxyActionClient
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Quaternion
 from tf.transformations import quaternion_from_euler
 from nav_msgs.msg import Odometry
 from flexbe_core.proxy import ProxySubscriberCached 
@@ -31,7 +31,7 @@ class BigRollState(EventState):
 		super(BigRollState, self).__init__(outcomes=['Success', 'Failure'])
 		self._topic = "/puddles/orientation"
 		self._angle = angle
-		self.client = ProxyPublisher({self._topic: PoseStamped})
+		self.client = ProxyPublisher({self._topic: Quaternion})
 		self._sub = ProxySubscriberCached({'/puddles/odometry/filtered': Odometry}) # outputs current state variables, gives q of orientation
 
 	def execute(self, userdata):			
@@ -39,20 +39,26 @@ class BigRollState(EventState):
 		return status
 	
 	def on_enter(self, userdata):
+
 		Logger.loginfo('Rolling with angle %f'%self._angle)
 		radian = math.radians(self._angle) # converts angle from degrees to radians
 		myQuaternion = quaternion_from_euler(radian,0,0) # converts from radians to quaternions
-		initmsg = self._sub.get_last_msg('/puddles/odometry/filtered') # initial position
+		while(not self._sub.has_msg('/puddles/odometry/filtered')):
+			Logger.loginfo('Waiting for Current Orientation')
+		
+		msg = Odometry()
+		msg = self._sub.get_last_msg('/puddles/odometry/filtered') # initial position
 		self._sub.remove_last_msg('/puddles/odometry/filtered') # clear
-		quaternion = quaternion_from_euler(0, 0, 0)
-		#type(pose) = geometry_msgs.msg.Pose
-		tientation 
-		quaternion[0] = initOrientation.x
-		quaternion[1] = initOrientation.y
-		quaternion[2] = initOrientation.z
-		quaternion[3] = initOrientation.w
 
-		newQuat = quaternion_multiply(myQuaternion, quaternion)
+		quaternion = quaternion_from_euler(0, 0, 0)
+		
+		quaternion[0] = msg.pose.pose.orientation.x
+		quaternion[1] = msg.pose.pose.orientation.y
+		quaternion[2] = msg.pose.pose.orientation.z
+		quaternion[3] = msg.pose.pose.orientation.w
+
+		newQuat = quaternion_multiply(quaternion, myQuaternion)
+		initOrientation = Quaternion()
 		initOrientation.x = newQuat[0]
 		initOrientation.y = newQuat[1]
 		initOrientation.z = newQuat[2]
