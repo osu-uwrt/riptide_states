@@ -5,7 +5,26 @@ import rospy
 from flexbe_core.proxy import ProxySubscriberCached
 from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped
 import tf
+from enum import Enum
 
+class GatePos(Enum):
+	pose = Pose()
+	pose.position.x = 1
+	pose.position.y = -3
+	pose.position.z = 0
+	pose.orientation.x = 0
+	pose.orientation.y = 0
+	pose.orientation.z =  0.707
+	pose.orientation.w =  0.707
+class PolePos(Enum):
+	pose = Pose()
+	pose.position.x = -3
+	pose.position.y = 0
+	pose.position.z = 0
+	pose.orientation.x = 0
+	pose.orientation.y = 0
+	pose.orientation.z =  0
+	pose.orientation.w =  1
 
 class GetFrontOf(EventState):
 	"""
@@ -32,6 +51,10 @@ class GetFrontOf(EventState):
 		"""Constructor"""
 		super(GetFrontOf, self).__init__(outcomes=['Success'], output_keys=['x','y','z','orientation'])
 		self._frame = target
+		if(self._frame=="pole_frame"):
+			self._transformed_pose = GatePos.pose
+		elif(self._frame=="gate_frame"):
+			self._transformed_pose = PolePos.pose
 		#Logger.loginfo(target)
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
@@ -41,14 +64,7 @@ class GetFrontOf(EventState):
 	def callback(self,userdata):
 
 		#Changing the coordinate system into the viewpoint of the target to easily move the robot three feet in front of it
-		transformed_pose = Pose()
-		transformed_pose.position.x = 1
-		transformed_pose.position.y = -3
-		transformed_pose.position.z = 0
-		transformed_pose.orientation.x = 0
-		transformed_pose.orientation.y = 0
-		transformed_pose.orientation.z =  0.707
-		transformed_pose.orientation.w =  0.707
+		transformed_pose = self._transformed_pose
 		#Changing the coordinates back into global
 		_updated_pose = self.transform_pose(transformed_pose,self._frame,"/world")
 		#Splitting the pose to be able to be used in the move state (Maybe change move state to use pose instead of xyzw)
