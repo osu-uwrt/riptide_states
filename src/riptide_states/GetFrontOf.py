@@ -7,24 +7,24 @@ from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped
 import tf
 from enum import Enum
 
-class GatePos(Enum):
-	pose = Pose()
-	pose.position.x = 1
-	pose.position.y = -3
-	pose.position.z = 0
-	pose.orientation.x = 0
-	pose.orientation.y = 0
-	pose.orientation.z =  0.707
-	pose.orientation.w =  0.707
-class PolePos(Enum):
-	pose = Pose()
-	pose.position.x = -3
-	pose.position.y = 0
-	pose.position.z = 0
-	pose.orientation.x = 0
-	pose.orientation.y = 0
-	pose.orientation.z =  0
-	pose.orientation.w =  1
+
+gatePos = Pose()
+gatePos.position.x = 1
+gatePos.position.y = -3
+gatePos.position.z = 0
+gatePos.orientation.x = 0
+gatePos.orientation.y = 0
+gatePos.orientation.z =  0.707
+gatePos.orientation.w =  0.707
+
+polePos = Pose()
+polePos.position.x = -3
+polePos.position.y = 0
+polePos.position.z = 0
+polePos.orientation.x = 0
+polePos.orientation.y = 0
+polePos.orientation.z =  0
+polePos.orientation.w =  1
 
 class GetFrontOf(EventState):
 	"""
@@ -52,9 +52,9 @@ class GetFrontOf(EventState):
 		super(GetFrontOf, self).__init__(outcomes=['Success'], output_keys=['x','y','z','orientation'])
 		self._frame = target
 		if(self._frame=="pole_frame"):
-			self._transformed_pose = GatePos.pose
+			self._transformed_pose = polePos
 		elif(self._frame=="gate_frame"):
-			self._transformed_pose = PolePos.pose
+			self._transformed_pose = gatePos
 		#Logger.loginfo(target)
 		self._start_time = rospy.Time.now()
 		self._timeout_temp = 1
@@ -62,7 +62,6 @@ class GetFrontOf(EventState):
 
 
 	def callback(self,userdata):
-
 		#Changing the coordinate system into the viewpoint of the target to easily move the robot three feet in front of it
 		transformed_pose = self._transformed_pose
 		#Changing the coordinates back into global
