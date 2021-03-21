@@ -6,11 +6,10 @@ import sys
 
 from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxySubscriberCached
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Quaternion
 
 import moveit_commander
 import moveit_msgs.msg
-import geometry_msgs.msg
 from moveit_commander.conversions import pose_to_list
 from nav_msgs.msg import Odometry
 
@@ -73,11 +72,11 @@ class BigMoveState(EventState):
 		
 
 		if self.orientation == None:
-		 	self.orientation = geometry_msgs.Quaternion()
+			self.orientation = Quaternion()
 			self.orientation.x = msg.pose.pose.orientation.x
-		 	self.orientation.y = msg.pose.pose.orientation.y
+			self.orientation.y = msg.pose.pose.orientation.y
 			self.orientation.z = msg.pose.pose.orientation.z
-		 	self.orientation.w = msg.pose.pose.orientation.w
+			self.orientation.w = msg.pose.pose.orientation.w
 		
 			
 
