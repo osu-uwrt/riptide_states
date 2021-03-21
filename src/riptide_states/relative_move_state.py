@@ -37,14 +37,10 @@ class RelativeMoveState(EventState):
 
 
 	def execute(self, userdata):
-		threshold = .2
-		if self.sub.has_msg(self.loc_topic):
-			msg = self.sub.get_last_msg(self.loc_topic)
-			self.sub.remove_last_msg(self.loc_topic)
-			if userdata.x-threshold < msg.pose.pose.position.x < userdata.x +threshold:
-				if userdata.y-threshold < msg.pose.pose.position.y < userdata.y+threshold:
-					if userdata.z - threshold < msg.pose.pose.position.z < userdata.z+threshold:
-						return 'Success'
+		Logger.loginfo("Waiting 5 seconds for move to complete")
+		rospy.sleep(5)
+		Logger.loginfo("Done moving")
+		return 'Success'
 		
 	def on_enter(self, userdata):
 		#find the most recent transform
@@ -67,7 +63,7 @@ class RelativeMoveState(EventState):
 		msg.x = convertedPos.pose.position.x
 		msg.y = convertedPos.pose.position.y
 		msg.z = convertedPos.pose.position.z
-
+		Logger.loginfo("Moving: {}, {}, {}".format(msg.x,msg.y,msg.z))
 		self._pub.publish(self._topic,msg)
 
 
