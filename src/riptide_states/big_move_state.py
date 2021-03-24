@@ -7,6 +7,7 @@ import sys
 from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxySubscriberCached
 from geometry_msgs.msg import PoseStamped, Quaternion, Vector3
+from std_msgs.msg import Bool
 
 import moveit_commander
 import moveit_msgs.msg
@@ -32,28 +33,25 @@ class BigMoveState(EventState):
 		super(BigMoveState, self).__init__(outcomes=['done','failed'],
 											input_keys=['x', 'y', 'z', 'orientation'])
 		
-		self._pub = ProxyPublisher({"/puddles/linear_velocity": Vector3})
+		self.steady_topic = '/puddles/steady'
 		self.loc_topic = '/puddles/odometry/filtered'
-		self.sub = ProxySubscriberCached({self.loc_topic: Odometry})
+		self.sub = ProxySubscriberCached({self.loc_topic: Odometry , self.steady_topic: Bool})
 		moveit_commander.roscpp_initialize(sys.argv)
 		#rospy.init_node('test_move_group', anonymous=True)
 		
 	def execute(self, userdata):
-		threshold = .2
-		if self.sub.has_msg(self.loc_topic):
-			msg = self.sub.get_last_msg(self.loc_topic)
-			self.sub.remove_last_msg(self.loc_topic)
-			if userdata.x-threshold < msg.pose.pose.position.x < userdata.x +threshold:
-				if userdata.y-threshold < msg.pose.pose.position.y < userdata.y+threshold:
-					if userdata.z - threshold < msg.pose.pose.position.z < userdata.z+threshold:
+		
+		if self.sub.has_msg(self.steady_topic):
+			msg = self.sub.get_last_msg(self.steady_topic)
+			self.sub.remove_last_msg(self.steady_topic)
+			if msg.data:
 						self.move_group.stop()
 						del self.move_group
 						return 'done'
 		
 	
 	def on_enter(self, userdata):
-		self._pub.publish("/puddles/linear_velocity", Vector3(0,0,0))
-		rospy.sleep(1)
+		
 		self.x = userdata.x
 		self.y = userdata.y
 		self.z = userdata.z
