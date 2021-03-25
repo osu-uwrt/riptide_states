@@ -9,7 +9,7 @@ from geometry_msgs.msg import PoseStamped
 
 class BigDawgsGottaEatState(EventState):
 	"""
-	Publishes a pose from userdata so that it can be displayed in rviz.
+	Our template state that does nothing.
 
 	-- topic 		string 			Topic to which the pose will be published.
 

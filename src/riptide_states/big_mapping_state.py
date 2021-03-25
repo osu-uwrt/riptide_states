@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-
 from flexbe_core import EventState, Logger
 import rospy
 import riptide_controllers.msg
-from flexbe_core.proxy import ProxyPublisher
+from flexbe_core.proxy import ProxyPublisher 
 from flexbe_core.proxy import ProxyActionClient
 from geometry_msgs.msg import PoseStamped
 
 
-class BigGateManeuverState(EventState):
-	"""
-	(deprecated) does the gate task maneuver.
+class BigMappingState(EventState):
+    """
+	Brings data in from mapping topic. 
+    Subscribes to mapping topic.
 
 	-- topic 		string 			Topic to which the pose will be published.
 
@@ -22,18 +21,17 @@ class BigGateManeuverState(EventState):
 	
 	def __init__(self, topic):
 		"""Constructor"""
-		super(BigGateManeuverState, self).__init__(outcomes=['Success', 'Failure'])
+		super(BigMappingState, self).__init__(outcomes=['Success', 'Failure'],
+            input_keys=['angle'])
 		self._topic = topic
-		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GateManeuverAction})
-		#self._pub = ProxyPublisher({self._topic: PoseStamped})
-
+		self.sub = ProxySubscriber("/puddles/mapping/gate", PoseWithCovarianceStamped, queue_size=1)
 
 	def execute(self, userdata):
 		if self.client.has_result(self._topic):
 			result = self.client.get_result(self._topic)
 			status = 'Success'       
 			return status
+
+
+
 	
-	def on_enter(self, userdata):
-		Logger.loginfo('Aligning robot')
-		self.client.send_goal(self._topic, riptide_controllers.msg.GateManeuverGoal())

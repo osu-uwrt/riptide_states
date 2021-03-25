@@ -6,7 +6,11 @@ import riptide_controllers.msg
 from flexbe_core.proxy import ProxyPublisher
 from flexbe_core.proxy import ProxyActionClient
 from geometry_msgs.msg import PoseStamped
-
+from tf.transformations import quaternion_from_euler
+from nav_msgs.msg import Odometry
+from flexbe_core.proxy import ProxySubscriberCached 
+from tf import transformations
+from tf.transformations import quarternion_multiply
 
 class BigYawState(EventState):
 	"""
@@ -20,14 +24,13 @@ class BigYawState(EventState):
 
 	"""
 	
-	def __init__(self, topic):
+	def __init__(self, angle):
 		"""Constructor"""
-		super(BigYawState, self).__init__(outcomes=['Success', 'Failure'],
-            input_keys=['angle'])
-		self._topic = topic
-		self.client = ProxyActionClient({self._topic: riptide_controllers.msg.GoToYawAction})
-		#self._pub = ProxyPublisher({self._topic: PoseStamped})
-
+		super(BigYawState, self).__init__(outcomes=['Success', 'Failure'])
+		self._topic = "/puddles/orientation"
+		self._angle = angle
+		self.client = ProxyPublisher({self._topic: PoseStamped})
+		self._sub = ProxySubscriberCached({'/puddles/odometry/filtered': Odometry}) # outputs current state variables, gives q of orientation
 
 	def execute(self, userdata):
 		if self.client.has_result(self._topic):
@@ -36,5 +39,12 @@ class BigYawState(EventState):
 			return status
 	
 	def on_enter(self, userdata):
-		Logger.loginfo('Yawing with angle %f'%userdata.angle)
-		self.client.send_goal(self._topic, riptide_controllers.msg.GoToYawGoal(userdata.angle))
+		Logger.loginfo('Yawing with angle %f'%self._angle)
+		radian = math.radians(self._angle) # converts angle from degrees to radians
+		myQuaternion = quaternion_from_euler(0,0,radian) # converts from radians to quaternions
+		initmsg = self._sub.get_last_msg('/puddles/odometry/filtered') # initial position
+		self._sub.remove_last_msg('/puddles/odometry/filtered') # clear
+		
+		initOrientation = initmsg.pose.pose.orientation 
+		newQuat = quarternion_multiply(initOrientation, myQuaternion)
+		self.client.publish(self._topic, newQuat)
