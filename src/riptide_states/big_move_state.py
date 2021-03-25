@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from time import time
 from flexbe_core import EventState, Logger
 import rospy
 import sys
@@ -37,29 +38,43 @@ class BigMoveState(EventState):
 		self.loc_topic = '/puddles/odometry/filtered'
 		self.sub = ProxySubscriberCached({self.loc_topic: Odometry , self.steady_topic: Bool})
 		moveit_commander.roscpp_initialize(sys.argv)
+		group_name = "puddles_base"
+		self.move_group = moveit_commander.MoveGroupCommander(group_name)
+
 		#rospy.init_node('test_move_group', anonymous=True)
 		
 	def execute(self, userdata):
-		
-		if self.sub.has_msg(self.steady_topic):
-			msg = self.sub.get_last_msg(self.steady_topic)
-			self.sub.remove_last_msg(self.steady_topic)
-			if msg.data:
+		threshold = .4
+		if self.sub.has_msg(self.loc_topic):
+			pos = self.sub.get_last_msg(self.loc_topic)
+			if userdata.x - threshold < pos.pose.pose.position.x < userdata.x + threshold and userdata.y - threshold < pos.pose.pose.position.y < userdata.y + threshold and userdata.z - threshold < pos.pose.pose.position.z < userdata.z + threshold:
+				
+				if self.sub.has_msg(self.steady_topic):
+					msg = self.sub.get_last_msg(self.steady_topic)
+					self.sub.remove_last_msg(self.steady_topic)
+					if msg.data:
 						self.move_group.stop()
 						del self.move_group
 						return 'done'
 		
+
+		
 	
 	def on_enter(self, userdata):
+
+		steady = False
+		while not steady:
+			if self.sub.has_msg(self.steady_topic):
+				steady_msg = self.sub.get_last_msg(self.steady_topic)
+				steady = steady_msg.data
+		
 		
 		self.x = userdata.x
 		self.y = userdata.y
 		self.z = userdata.z
 		self.orientation = userdata.orientation	
 
-		group_name = "puddles_base"
-		self.move_group = moveit_commander.MoveGroupCommander(group_name)
-
+		
 		
 
 		

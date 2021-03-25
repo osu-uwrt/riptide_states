@@ -18,7 +18,7 @@ gatePos.orientation.z =  0.707
 gatePos.orientation.w =  0.707
 
 polePos = Pose()
-polePos.position.x = -3
+polePos.position.x = -1
 polePos.position.y = 0
 polePos.position.z = 0
 polePos.orientation.x = 0

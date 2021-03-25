@@ -73,4 +73,6 @@ class RelativeMoveState(EventState):
 		Logger.loginfo("Moving: {}, {}, {}".format(msg.x,msg.y,msg.z))
 		self._pub.publish(self._topic,msg)
 
+		rospy.sleep(3)
+
 
