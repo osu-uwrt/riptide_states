@@ -15,7 +15,6 @@
   <run_depend>flexbe_testing</run_depend>
   <run_depend>roslaunch</run_depend>
   <run_depend>moveit_commander</run_depend>
-  <run_depend>moveit-python</run_depend>
   <run_depend>moveit</run_depend>
 
   <export>
