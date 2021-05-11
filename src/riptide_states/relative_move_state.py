@@ -50,7 +50,7 @@ class RelativeMoveState(EventState):
 		
 	def on_enter(self, userdata):
 		#find the most recent transform
-		t = self.tl.getLatestCommonTime(self._frame,"/world")
+		t = self.tl.getLatestCommonTime(self._frame,"world")
 		#populate our query
 		pl = PoseStamped()
 		pl.header.frame_id = self._frame
@@ -60,7 +60,7 @@ class RelativeMoveState(EventState):
 		pl.pose.position.y = self._y
 		pl.pose.position.z = self._z
 	
-		convertedPos = self.tl.transformPose("/world", pl)
+		convertedPos = self.tl.transformPose("world", pl)
 
 		msg = Vector3()
 		

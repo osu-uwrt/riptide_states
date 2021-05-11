@@ -41,7 +41,7 @@ class TransferToGlobal(EventState):
 		#Changing the coordinate system into the viewpoint of the target to easily move the robot three feet in front of it
 		
 		
-		t = self.tl.getLatestCommonTime(self._frame,"/world")
+		t = self.tl.getLatestCommonTime(self._frame,"world")
 		pl = PoseStamped()
 		pl.header.frame_id = self._frame
 		pl.header.stamp = t
@@ -65,7 +65,7 @@ class TransferToGlobal(EventState):
 		pl.pose.orientation = self._pose.orientation
 
 		convertedPos = PoseStamped()
-		convertedPos = self.tl.transformPose("/world", pl)
+		convertedPos = self.tl.transformPose("world", pl)
 
 		#Logger.loginfo('XYZ: {},{},{} and orientation {},{},{},{}'.format(convertedPos.position.x,convertedPos.position.y,convertedPos.position.z,transformed_pose.position.orientation.x,transformed_pose.position.orientation.y,transformed_pose.position.orientation.z,transformed_pose.position.orientation.w))
 		userdata.x = convertedPos.pose.position.x

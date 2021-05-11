@@ -51,7 +51,7 @@ class FlattenState(EventState):
 		
 	def on_enter(self, userdata):
 		#find the most recent transform
-		t = self.tl.getLatestCommonTime(self._frame,"/world")
+		t = self.tl.getLatestCommonTime(self._frame,"world")
 		#populate our query
 		
 
@@ -63,7 +63,7 @@ class FlattenState(EventState):
 		pl.pose.position.y = 0
 		pl.pose.position.z = -.5
 	
-		convertedPos = self.tl.transformPose("/world", pl)
+		convertedPos = self.tl.transformPose("world", pl)
 
 		msg = Vector3()
 		
